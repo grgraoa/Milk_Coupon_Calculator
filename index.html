@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#075c9b">
+<title>GR Grand Residency – Milk Coupon Calculator</title>
+<style>
+*{box-sizing:border-box} :root{--navy:#092d5c;--blue:#0968e5;--orange:#ff4b12;--green:#08751c;--brown:#74320f;--muted:#56616d;--line:#c9d9e8}
+body{margin:0;background:#f6f9fb;color:#102a50;font-family:Arial,Helvetica,sans-serif}
+.app{max-width:720px;margin:0 auto;padding:10px 10px 24px}
+.hero{background:linear-gradient(135deg,#07518c,#0068a7);color:#fff;border-radius:18px;padding:18px 14px;text-align:center}
+.hero h1{font-size:28px;line-height:1.05;margin:0;font-weight:800}.hero h2{font-size:21px;line-height:1.1;margin:5px 0 10px;font-weight:800}.hero p{font-size:13px;margin:0;line-height:1.35}
+.table{margin-top:12px;border:1px solid #b9d7ed;border-radius:16px;overflow:hidden;background:#fff}
+.th,.row{display:grid;grid-template-columns:minmax(0,1.45fr) 84px 148px;align-items:center;gap:7px}
+.th{padding:11px 12px;background:#f4f8fc;font-size:13px;font-weight:800;color:#102a50}.th div:nth-child(2),.th div:nth-child(3){text-align:center}
+.row{padding:10px 10px;border-top:1px solid #d9e7f2}.row.blue{background:#eef8ff}.row.orange{background:#fff5e8}.row.green{background:#effbed}.row.brown{background:#fbf4e9}
+.name{font-size:18px;font-weight:800;line-height:1.15}.blue .name{color:var(--blue)}.orange .name{color:var(--orange)}.green .name{color:var(--green)}.brown .name{color:var(--brown)}
+.sub{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.25}.rate{text-align:center;font-size:21px;font-weight:800;color:#111}
+.qty{display:flex;justify-content:center;align-items:center;gap:5px}.qty button,.qty input{height:44px;border-radius:10px}.qty button{width:43px;border:0;color:#fff;font-size:25px;font-weight:700}.minus{background:#a8afb5}.blue .plus{background:var(--blue)}.orange .plus{background:var(--orange)}.green .plus{background:var(--green)}.brown .plus{background:#996025}
+.qty input{width:50px;border:1px solid #a9c2d7;background:#fff;text-align:center;font-size:18px;font-weight:700;color:#111}
+.summary{margin-top:13px;background:#fff;border:1px solid #b9d7ed;border-radius:16px;padding:15px}.sumline{display:flex;justify-content:space-between;gap:12px;margin:9px 0;font-size:14px;font-weight:700}.sumline span:last-child{font-size:17px}
+.pay{margin-top:13px;padding:14px;border-top:1px solid #b8c8d5;background:#eefbef;border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;color:#075d19}.pay .label{font-size:20px;font-weight:800}.pay .amount{font-size:35px;font-weight:900}
+.actions{display:grid;grid-template-columns:1.2fr 1fr .75fr;gap:8px;margin-top:12px}.actions button{min-height:54px;border:0;border-radius:12px;color:#fff;font-weight:800;font-size:15px;padding:7px}.share{background:#19a951}.copy{background:#0879df}.reset{background:#9da4aa}.actions small{display:block;font-size:10px;font-weight:400;margin-top:3px}
+.msg{font-size:12px;color:#58636e;margin:8px 3px 0;white-space:pre-wrap}.foot{text-align:center;color:#77828d;font-size:10px;margin-top:13px}
+@media(max-width:480px){.app{padding:7px 6px 20px}.hero{border-radius:15px;padding:15px 8px}.hero h1{font-size:23px}.hero h2{font-size:18px}.th,.row{grid-template-columns:minmax(0,1.35fr) 58px 126px;gap:4px}.th{padding:9px 7px;font-size:11px}.row{padding:9px 6px}.name{font-size:16px}.sub{font-size:10px}.rate{font-size:18px}.qty button{width:36px}.qty input{width:43px}.pay .label{font-size:17px}.pay .amount{font-size:31px}.actions{grid-template-columns:1fr 1fr}.reset{grid-column:1/-1}.actions button{min-height:49px}}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="hero">
+  <h1>GR Grand Residency</h1>
+  <h2>Milk Coupon Calculator</h2>
+  
+</section>
+
+<section class="table">
+ <div class="th"><div>Product</div><div>MRP of Packet</div><div>Number of Packets</div></div>
+ <div id="rows"></div>
+</section>
+
+<section class="summary">
+ <div class="sumline"><span>Total packets</span><span id="count">0</span></div>
+ <div class="sumline"><span>Amount (MRP)</span><span id="milk">₹0</span></div>
+ <div class="sumline"><span>Service charge (₹1 per packet)</span><span id="service">₹0</span></div>
+ <div class="pay"><div class="label">Total Amount Payable</div><div id="total" class="amount" aria-live="polite">₹0</div></div>
+</section>
+
+<div class="actions">
+ <button id="share" class="share" type="button">Share Order<small>WhatsApp / phone share</small></button>
+ <button id="copy" class="copy" type="button">Copy Order<small>Copy to clipboard</small></button>
+ <button id="reset" class="reset" type="button">Reset<small>Clear all</small></button>
+</div>
+<div id="msg" class="msg" aria-live="polite"></div>
+<div class="foot">GR Grand Residency Residents' Milk Coupon Calculator</div>
+</main>
+
+<script>
+const products=[
+ {name:"Blue - 1/2 Ltr",base:24,cls:"blue"},
+ {name:"Blue - 1 Ltr",base:46,cls:"blue"},
+ {name:"Orange - 1/2 Ltr",base:27,cls:"orange"},
+ {name:"Orange - 1 Ltr",base:52,cls:"orange"},
+ {name:"Green - 1/2 Ltr",base:26,cls:"green"},
+ {name:"Curd - 1/2 Ltr",base:28,cls:"brown"}
+];
+const rows=document.getElementById("rows");
+products.forEach((p,i)=>{
+ const r=document.createElement("div"); r.className="row "+p.cls;
+ r.innerHTML=`<div><div class="name">${p.name}</div></div>
+ <div class="rate">₹${p.base}</div>
+ <div class="qty"><button class="minus" type="button" data-minus="${i}" aria-label="Decrease ${p.name}">−</button>
+ <input data-q="${i}" inputmode="numeric" value="0" aria-label="${p.name} coupon quantity">
+ <button class="plus" type="button" data-plus="${i}" aria-label="Increase ${p.name}">+</button></div>`;
+ rows.appendChild(r);
+});
+const inputs=[...document.querySelectorAll("[data-q]")];
+const countEl=document.getElementById("count"),milkEl=document.getElementById("milk"),serviceEl=document.getElementById("service"),totalEl=document.getElementById("total"),msg=document.getElementById("msg");
+function clean(v){let n=parseInt(String(v).replace(/\D/g,""),10);return Number.isFinite(n)?Math.min(999,Math.max(0,n)):0}
+function calc(){let c=0,m=0;inputs.forEach((el,i)=>{let q=clean(el.value);el.value=q;c+=q;m+=q*products[i].base});return{c,m,t:m+c}}
+function update(){const x=calc();countEl.textContent=x.c;milkEl.textContent="₹"+x.m.toLocaleString("en-IN");serviceEl.textContent="₹"+x.c.toLocaleString("en-IN");totalEl.textContent="₹"+x.t.toLocaleString("en-IN");msg.textContent=""}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-plus],[data-minus]");if(!b)return;const i=+(b.dataset.plus??b.dataset.minus),el=inputs[i],q=clean(el.value);el.value=b.hasAttribute("data-plus")?q+1:Math.max(0,q-1);update()});
+inputs.forEach(el=>el.addEventListener("input",update));
+document.getElementById("reset").addEventListener("click",()=>{inputs.forEach(el=>el.value=0);update()});
+function orderText(){const x=calc(),a=["GR Grand Residency – Milk Order",""];inputs.forEach((el,i)=>{const q=clean(el.value);if(q){const mrp=products[i].base;a.push(`${products[i].name}: ${q} packet${q===1?"":"s"} × ₹${mrp} = ₹${q*mrp}`)}});a.push("",`Total Packets: ${x.c}`,`Amount (MRP): ₹${x.m}`,`Service Charge: ₹${x.c}`,`Total Amount Payable: ₹${x.t}`);return a.join("\n")}
+document.getElementById("share").addEventListener("click",async()=>{const x=calc();if(!x.c){msg.textContent="Please select at least one coupon first.";return}const s=orderText();if(navigator.share){try{await navigator.share({title:"GR Grand Residency – Milk Order",text:s})}catch(e){if(e.name!=="AbortError")msg.textContent="Sharing could not be opened. Please use Copy Order."}}else{msg.textContent="Phone sharing is not available in this browser. Please use Copy Order."}});
+document.getElementById("copy").addEventListener("click",async()=>{const x=calc();if(!x.c){msg.textContent="Please select at least one coupon first.";return}const s=orderText();try{await navigator.clipboard.writeText(s);msg.textContent="Order copied. You can paste it into WhatsApp."}catch(e){msg.textContent="Copy is blocked by this browser. Order summary:\n\n"+s}});
+update();
+</script>
+</body>
+</html>
